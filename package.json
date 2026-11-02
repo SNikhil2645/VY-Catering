@@ -2,43 +2,24 @@
   "name": "venky-yadav-caterings",
   "version": "1.0.0",
   "private": true,
-  "description": "Venky Yadav Caterings & Cafe — Premium Hospitality Platform",
+  "description": "Venky Yadav Caterings & Cafe — Premium Hospitality Platform (client + server monorepo)",
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "prisma generate && next build",
-    "start": "next start",
-    "lint": "next lint",
-    "db:push": "prisma db push",
-    "db:generate": "prisma generate",
-    "db:seed": "node prisma/seed.js",
-    "test": "node --test tests/unit/*.test.js"
-  },
-  "dependencies": {
-    "@hookform/resolvers": "^3.9.1",
-    "@prisma/client": "^5.22.0",
-    "bcryptjs": "^2.4.3",
-    "canvas-confetti": "^1.9.3",
-    "clsx": "^2.1.1",
-    "framer-motion": "^11.11.17",
-    "gsap": "^3.12.5",
-    "lucide-react": "^0.460.0",
-    "next": "^15.5.28",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "react-hook-form": "^7.53.2",
-    "tailwind-merge": "^2.5.4",
-    "zod": "^3.23.8"
+    "dev": "concurrently -n server,client -c magenta,cyan \"npm run dev -w @vyc/server\" \"npm run dev -w @vyc/client\"",
+    "build": "npm run build -w @vyc/server && npm run build -w @vyc/client",
+    "start": "concurrently -n server,client -c magenta,cyan \"npm run start -w @vyc/server\" \"npm run start -w @vyc/client\"",
+    "lint": "npm run lint -w @vyc/client",
+    "test": "node --test tests/unit/*.test.js",
+    "db:push": "npm run db:push -w @vyc/server",
+    "db:generate": "npm run db:generate -w @vyc/server",
+    "db:seed": "npm run db:seed -w @vyc/server",
+    "db:studio": "npm run db:studio -w @vyc/server",
+    "verify": "npm run verify -w @vyc/server"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/canvas-confetti": "^1.9.0",
-    "@types/node": "^20.17.6",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "prisma": "^5.22.0",
-    "tailwindcss": "^3.4.15",
-    "typescript": "^5.6.3"
+    "concurrently": "^9.1.2"
   }
 }

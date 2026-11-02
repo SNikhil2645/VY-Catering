@@ -1096,67 +1096,59 @@ Do not claim the website is deployed unless deployment has actually succeeded.
 
 Adapt this structure to the chosen implementation without forcing unnecessary files.
 
-app/
-  page.tsx
-  layout.tsx
-  about/
-  services/
-  menu/
-  gallery/
-  cafe/
-  booking/
-  contact/
-  privacy/
-  terms/
-  admin/
-  api/
+.
+├── client/                          # Next.js 15 frontend package (@vyc/client)
+│   ├── public/                      # Static images, icons, brand assets
+│   ├── src/
+│   │   ├── app/                     # App Router routes (pages only, no API routes)
+│   │   │   ├── page.tsx             # Cinematic home
+│   │   │   ├── layout.tsx
+│   │   │   ├── about/
+│   │   │   ├── services/            # Hub + [slug] detail
+│   │   │   ├── functions/
+│   │   │   ├── menu/
+│   │   │   ├── gallery/
+│   │   │   ├── cafe/
+│   │   │   ├── booking/
+│   │   │   ├── contact/
+│   │   │   ├── privacy/
+│   │   │   ├── terms/
+│   │   │   ├── robots.ts
+│   │   │   ├── sitemap.ts
+│   │   │   └── admin/               # Protected dashboard pages
+│   │   ├── components/              # layout, hero, sections, motion, booking, menu, gallery, ui
+│   │   └── lib/                     # Client-side utils + validation schemas
+│   ├── next.config.js               # Rewrites /api + /uploads to the API
+│   ├── tailwind.config.ts
+│   ├── postcss.config.js
+│   ├── tsconfig.json
+│   └── .env.example
+│
+├── server/                          # Express + Prisma API package (@vyc/server)
+│   ├── src/
+│   │   ├── index.ts                 # HTTP listener
+│   │   ├── app.ts                   # Express app wiring
+│   │   ├── config/                  # Environment configuration
+│   │   ├── db/                      # Prisma client singleton
+│   │   ├── auth/                    # Token signing/verification + session helpers
+│   │   ├── middleware/              # Admin guard + error handlers
+│   │   ├── validation/              # Zod schemas
+│   │   ├── utils/                   # Reference code generation
+│   │   └── routes/                  # auth, enquiries, gallery, menu, content, admin/*
+│   ├── prisma/                      # schema.prisma, seed.js, maintenance scripts, dev.db
+│   ├── scripts/                     # verify-upgrade.js
+│   ├── uploads/                     # Runtime media (/uploads/gallery|menu|general)
+│   ├── tsconfig.json
+│   └── .env.example
+│
+├── tests/                           # Automated tests (unit, integration, e2e)
+├── docs/                            # architecture, database, deployment, asset-sources, testing
+├── package.json                     # npm workspaces + unified scripts
+├── package-lock.json
+├── .gitignore
+└── README.md
 
-components/
-  layout/
-  navigation/
-  hero/
-  sections/
-  menu/
-  gallery/
-  booking/
-  forms/
-  animations/
-  ui/
-
-lib/
-  auth/
-  db/
-  validation/
-  services/
-  email/
-  security/
-  seo/
-
-prisma/
-  schema.prisma
-  migrations/
-
-public/
-  images/
-  icons/
-  fonts/
-
-tests/
-  unit/
-  integration/
-  e2e/
-
-docs/
-  architecture.md
-  database.md
-  deployment.md
-  asset-sources.md
-  testing.md
-
-.env.example
-README.md
-
-The final architecture may differ if there is a clear technical reason. Keep server-only code out of client bundles and do not expose privileged database access to the browser.
+The final architecture may differ if there is a clear technical reason. Keep server-only code out of client bundles and do not expose privileged database access to the browser. In this implementation the browser only talks to the Next.js origin, which proxies `/api/*` and `/uploads/*` to the Express API.
 
 ## 19. REQUIRED DOCUMENTATION
 

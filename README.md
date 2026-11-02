@@ -27,7 +27,7 @@
 - **Protected Access:** Session-based authentication with encrypted password hashing (`bcryptjs`) and secure HttpOnly cookie verification.
 - **Overview Dashboard:** Real-time database metrics for total enquiries, new leads, confirmed events, and catalog counts.
 - **Enquiry Triage (`/admin/enquiries`):** Search, filter by 7 lifecycle statuses, update statuses, add internal operational notes, and export to CSV.
-- **Catalog Management (`/admin/menu`):** Add dishes, update pricing, assign categories, and toggle availability.
+- **Catalog Management (`/admin/menu`):** Add dishes, update pricing, assign categories, upload images, and toggle availability.
 - **Gallery Manager (`/admin/gallery`):** Manage photos, categories, alt text, and usage permission statuses.
 - **Business Profile Settings (`/admin/settings`):** Update addresses, phones, and operating hours in real time.
 
@@ -35,13 +35,20 @@
 
 ## 🛠️ Technology Stack
 
-- **Framework:** Next.js 14 (App Router)
+### Client (`client/`)
+- **Framework:** Next.js 15 (App Router) + React 19
 - **Language:** TypeScript 5.6 (Strict Mode)
 - **Styling:** Tailwind CSS with Indian Hospitality Design Tokens (Charcoal `#171411`, Warm Ivory `#F8F3E9`, Rich Maroon `#681F2B`, Antique Gold `#C6A15B`, Marigold `#E08A1E`, Banana Leaf `#4E6B3A`)
 - **Typography:** Playfair Display (Serif) + Inter (Sans) + Noto Sans Telugu (Brand Accents)
+- **Motion:** Framer Motion + GSAP ScrollTrigger
+- **Forms & Validation:** React Hook Form + Zod
+
+### Server (`server/`)
+- **Runtime:** Node.js + Express 4
+- **Language:** TypeScript 5.6
 - **Database & ORM:** Prisma ORM with SQLite (Local Dev) / PostgreSQL (Neon / Supabase Production)
-- **Validation:** Zod Schema Validation
-- **Icons:** Lucide React
+- **Auth:** HMAC-signed session tokens stored in HttpOnly cookies
+- **Uploads:** Multer with MIME + magic-byte validation, stored under `server/uploads/`
 
 ---
 
@@ -49,26 +56,53 @@
 
 ### 1. Prerequisites
 - **Node.js**: v18.17+ or v20+ (tested on Node v24.16.0)
-- **npm**: v9+
+- **npm**: v9+ (workspaces support)
 
 ### 2. Installation
-Open PowerShell in the project directory:
+Open PowerShell in the repository root:
 ```powershell
 npm install
 ```
 
-### 3. Database Initialization & Seeding
-Initialize the SQLite database and seed initial admin credentials, authentic menu items, and business profiles:
+### 3. Environment Setup
 ```powershell
-npx prisma db push
+Copy-Item client\.env.example client\.env.local
+Copy-Item server\.env.example server\.env
+```
+Adjust `DATABASE_URL`, `ADMIN_JWT_SECRET`, and admin credentials in `server/.env` as needed.
+
+### 4. Database Initialization & Seeding
+```powershell
+npm run db:push
 npm run db:seed
 ```
 
-### 4. Start Development Server
+### 5. Start Development (Client + API together)
 ```powershell
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- API: [http://localhost:4000](http://localhost:4000)
+- Health check: [http://localhost:4000/api/health](http://localhost:4000/api/health)
+
+The Next.js client proxies `/api/*` and `/uploads/*` to the Express server, so the browser sees a single origin and HttpOnly auth cookies work normally.
+
+---
+
+## 📜 Root Scripts
+
+| Script | Description |
+|---|---|
+| `npm run dev` | Run API and Next.js client concurrently |
+| `npm run build` | Build server (`tsc`) then client (`next build`) |
+| `npm run start` | Run both production servers concurrently |
+| `npm run lint` | Lint the Next.js client |
+| `npm test` | Run unit tests (`tests/unit`) |
+| `npm run db:push` | Push Prisma schema to the database |
+| `npm run db:generate` | Regenerate Prisma Client |
+| `npm run db:seed` | Seed admin, menu, gallery and content data |
+| `npm run db:studio` | Open Prisma Studio |
+| `npm run verify` | Run end-to-end verification (server + client must be running) |
 
 ---
 
@@ -83,7 +117,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Testing & Verification
 
-Run the automated test suite (Unit tests for validation schemas, reference code generation, formatters, and authentication token security):
+Run the automated unit test suite:
 ```powershell
 npm test
 ```
@@ -93,54 +127,64 @@ Run full production build verification:
 npm run build
 ```
 
+Run end-to-end API/admin verification (start `npm run dev` first):
+```powershell
+npm run verify
+```
+
 ---
 
 ## 📁 Project Structure
 
 ```
-├── app/
-│   ├── (public pages)
-│   │   ├── page.tsx (Cinematic Home)
-│   │   ├── about/page.tsx (Founder Story)
-│   │   ├── services/page.tsx (Services Hub)
-│   │   ├── services/[slug]/page.tsx (Service Details)
-│   │   ├── functions/page.tsx (25+ Event Taxonomy)
-│   │   ├── menu/page.tsx (Menu Explorer)
-│   │   ├── gallery/page.tsx (Masonry Gallery)
-│   │   ├── cafe/page.tsx (Cafe Teaser)
-│   │   ├── booking/page.tsx (4-Step Wizard)
-│   │   ├── contact/page.tsx (Dual Locations & Maps)
-│   │   ├── privacy/page.tsx
-│   │   └── terms/page.tsx
-│   ├── admin/ (Protected Admin Dashboard)
-│   └── api/ (Secure Route Handlers for Enquiries, Auth, Menu, Gallery)
-├── components/
-│   ├── layout/ (Navbar, Footer, KolamDivider)
-│   ├── hero/ (BananaLeafHero)
-│   ├── motion/ (ThaliOrbit, JourneyOfAFeast, FunctionFinder)
-│   ├── booking/ (BookingWizard)
-│   ├── menu/ (MenuExplorer)
-│   ├── gallery/ (GalleryGrid)
-│   └── ui/ (Button, Input, Select, Badge, Card)
-├── lib/
-│   ├── db/ (prisma.ts)
-│   ├── auth/ (token.ts, session.ts)
-│   ├── validation/ (enquirySchema.ts)
-│   └── utils/ (formatters.ts, referenceCode.ts)
-├── prisma/
-│   ├── schema.prisma
-│   └── seed.js
+.
+├── client/                        # Next.js 15 frontend
+│   ├── public/                    # Static images and brand assets
+│   ├── src/
+│   │   ├── app/                   # App Router pages (public + admin)
+│   │   ├── components/            # UI, layout, hero, motion, booking, menu, gallery
+│   │   └── lib/                   # Client-side utils + validation schemas
+│   ├── next.config.js             # Proxies /api and /uploads to the API server
+│   ├── tailwind.config.ts
+│   └── .env.example
+├── server/                        # Express + Prisma API
+│   ├── src/
+│   │   ├── app.ts                 # Express app, CORS, static uploads, route mounting
+│   │   ├── index.ts               # HTTP server entry point
+│   │   ├── config/                # Environment configuration
+│   │   ├── db/                    # Prisma client singleton
+│   │   ├── auth/                  # Token signing/verification + session helpers
+│   │   ├── middleware/            # Admin guard + error handling
+│   │   ├── validation/            # Zod schemas
+│   │   ├── utils/                 # Reference code generation
+│   │   └── routes/
+│   │       ├── auth.ts
+│   │       ├── enquiries.ts
+│   │       ├── gallery.ts
+│   │       ├── menu.ts
+│   │       ├── content.ts
+│   │       └── admin/             # gallery, menu, settings, stats, upload
+│   ├── prisma/                    # schema.prisma, seed.js, maintenance scripts, SQLite DB
+│   ├── scripts/                   # verify-upgrade.js
+│   ├── uploads/                   # Runtime media uploaded from the admin portal
+│   └── .env.example
+├── tests/
+│   └── unit/                      # Node test runner suites
 ├── docs/
 │   ├── architecture.md
 │   ├── database.md
 │   ├── deployment.md
 │   └── asset-sources.md
-└── tests/
-    └── unit/*.test.js
+└── package.json                   # npm workspaces + unified scripts
 ```
 
 ---
 
 ## 🌐 Production Deployment
 
-See [docs/deployment.md](docs/deployment.md) for full instructions on deploying to **Vercel** with a free serverless **Neon PostgreSQL** database.
+The project now deploys as two services:
+
+1. **Client:** Next.js on Vercel (or any Node host).
+2. **Server:** Express API on Render, Railway, Fly.io, or a VPS, with a persistent disk for `server/uploads` and SQLite (or a managed PostgreSQL database).
+
+See [docs/deployment.md](docs/deployment.md) for the full guide.

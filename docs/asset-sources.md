@@ -2,6 +2,11 @@
 
 This document tracks all imagery, media assets, their current licensing/placeholder status, and pending owner-supplied replacements.
 
+## Asset Locations
+- **Bundled/static images:** `client/public/` — served by Next.js at `/...` (e.g. `/mutton-biryani.png`).
+- **Admin-uploaded media:** `server/uploads/<gallery|menu|general>/` — served by the API at `/uploads/...` and proxied by the Next.js client.
+- **Database image URLs:** store either a static path (`/mutton-biryani.png`) or an upload path (`/uploads/gallery/<file>`). Both resolve through the client origin.
+
 ## Policy
 1. In Release 1, curated high-resolution culinary, hospitality, and event photography from open platforms (Unsplash License / Pexels License) are used as aesthetic placeholders.
 2. No stock photo is ever misrepresented as an actual photo of Venky Yadav's facility; all placeholders are flagged as `Replacement Pending Owner Approval`.
@@ -29,5 +34,5 @@ This document tracks all imagery, media assets, their current licensing/placehol
 | `cafe-fried-chicken` | Cafe | Unsplash (Crispy Golden Fried Chicken Wings) | Cafe Teaser Highlights | Verified Placeholder |
 | `woodfire-cooking` | Process | Unsplash (Large Deg on Firewood with aromatic steam) | Journey of a Feast Step 2 | Verified Placeholder |
 | `serving-feast` | Process | Unsplash (Banana leaf sadhya feast serving) | Journey of a Feast Step 4 | Verified Placeholder |
-| `venky-anna-platter` | Featured / Quality | `public/image_G-G4Sz.png` (Venky Anna holding feast platter) | Homepage "About Our Quality" Featured Column | Active Cutout Asset (`image_G-G4Sz.png`) |
+| `venky-anna-platter` | Featured / Quality | `client/public/image_G-G4Sz.png` (Venky Anna holding feast platter) | Homepage "About Our Quality" Featured Column | Active Cutout Asset (`image_G-G4Sz.png`) |
 | `founder-portrait` | About | Stylized Silhouette / Traditional Hospitality Avatar | About Page Founder Section | Awaiting Real Photo of Telavani Venkatesh |

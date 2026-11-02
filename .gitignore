@@ -1,38 +1,42 @@
 # dependencies
-/node_modules
-/.pnp
+node_modules/
+.pnp
 .pnp.js
 
 # testing
 /coverage
 
 # next.js
-/.next/
+.next/
 /out/
+next-env.d.ts
 
-# production
-/build
+# production builds
+dist/
+build/
 
 # misc
 .DS_Store
 *.pem
+*.tsbuildinfo
 
-# debug
+# debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
 .env
+.env*.local
+.env.local
 
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
 # prisma sqlite fallback
-prisma/dev.db
-prisma/dev.db-journal
+server/prisma/dev.db
+server/prisma/dev.db-journal
+
+# runtime uploads (keep folder, ignore files)
+server/uploads/*
+!server/uploads/.gitkeep
