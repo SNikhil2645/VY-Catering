@@ -3,6 +3,7 @@ import { Playfair_Display, Inter, Noto_Sans_Telugu } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import ScrollProgressIndicator from '@/components/layout/ScrollProgressIndicator';
 
 const serifFont = Playfair_Display({
   subsets: ['latin'],
@@ -100,6 +101,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-charcoal text-ivory antialiased">
+        <ScrollProgressIndicator />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

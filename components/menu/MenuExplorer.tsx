@@ -3,8 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Search, Flame, Utensils, Download, Check, Sparkles, Filter } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import DietaryIndicator from '@/components/ui/DietaryIndicator';
+import SpiceIndicator from '@/components/ui/SpiceIndicator';
 import { formatINR } from '@/lib/utils/formatters';
 
 interface MenuItem {
@@ -29,11 +32,13 @@ interface MenuCategory {
 }
 
 export default function MenuExplorer() {
+  const shouldReduceMotion = useReducedMotion();
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedDiet, setSelectedDiet] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function fetchMenu() {
@@ -80,7 +85,7 @@ export default function MenuExplorer() {
   return (
     <div className="space-y-10">
       {/* Search & Filter Toolbar */}
-      <div className="bg-charcoal-800 border border-gold/30 rounded-sm p-4 sm:p-6 shadow-xl space-y-4">
+      <div className="bg-white/[0.06] backdrop-blur-[16px] border border-white/[0.14] rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
           {/* Search Input */}
           <div className="relative w-full md:w-96">
@@ -109,20 +114,22 @@ export default function MenuExplorer() {
               <button
                 type="button"
                 onClick={() => setSelectedDiet('VEG')}
-                className={`px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition-all ${
-                  selectedDiet === 'VEG' ? 'bg-green-700 text-ivory' : 'text-ivory/60 hover:text-ivory'
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition-all ${
+                  selectedDiet === 'VEG' ? 'bg-emerald-900 text-emerald-200 border border-emerald-600/50' : 'text-ivory/60 hover:text-ivory'
                 }`}
               >
-                🌱 Veg Only
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>Vegetarian</span>
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedDiet('NON_VEG')}
-                className={`px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition-all ${
-                  selectedDiet === 'NON_VEG' ? 'bg-red-800 text-ivory' : 'text-ivory/60 hover:text-ivory'
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider transition-all ${
+                  selectedDiet === 'NON_VEG' ? 'bg-red-950 text-red-200 border border-red-700/50' : 'text-ivory/60 hover:text-ivory'
                 }`}
               >
-                🍗 Non-Veg
+                <span className="w-2 h-2 rounded-full bg-red-500" />
+                <span>Non-Veg</span>
               </button>
             </div>
 
@@ -199,34 +206,61 @@ export default function MenuExplorer() {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div
+          layout
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: shouldReduceMotion ? 0 : 0.07,
+              },
+            },
+          }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {filteredItems.map((item) => (
-            <div
+            <motion.div
+              layout
+              variants={{
+                hidden: shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+                },
+              }}
               key={item.id}
-              className="bg-charcoal-800 border border-gold/20 hover:border-gold rounded-sm overflow-hidden flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              className="bg-white/[0.05] backdrop-blur-[14px] border border-white/[0.12] hover:backdrop-blur-[20px] hover:border-white/[0.28] rounded-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.12)] hover:shadow-[0_20px_45px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.22)]"
             >
               {/* Dish Image */}
-              <div className="relative h-48 w-full overflow-hidden bg-charcoal-900">
-                {item.imageUrl ? (
+              <div className="relative h-52 w-full overflow-hidden bg-charcoal-900">
+                {item.imageUrl && !failedImages[item.id] ? (
                   <Image
                     src={item.imageUrl}
                     alt={item.name}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                    onError={() => {
+                      setFailedImages((prev) => ({ ...prev, [item.id]: true }));
+                    }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gold/30">
-                    <Utensils className="w-12 h-12" />
+                  <div className="w-full h-full flex flex-col items-center justify-center text-gold/30 bg-charcoal-900">
+                    <Utensils className="w-10 h-10 mb-2" />
+                    <span className="text-[10px] text-ivory/40 uppercase tracking-widest font-serif">
+                      Authentic Dish
+                    </span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal-800 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-charcoal-800 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-300" />
 
-                {/* Dietary Badge */}
-                <div className="absolute top-3 left-3">
-                  <Badge variant={item.dietaryType === 'VEG' ? 'veg' : 'non-veg'}>
-                    {item.dietaryType === 'VEG' ? '🌱 Vegetarian' : '🍗 Non-Veg'}
-                  </Badge>
+                {/* Professional Dietary Indicator */}
+                <div className="absolute top-3 left-3 z-10">
+                  <DietaryIndicator type={item.dietaryType} />
                 </div>
 
                 {/* Category Pill */}
@@ -252,16 +286,7 @@ export default function MenuExplorer() {
                 </div>
 
                 <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-                  <div className="flex items-center space-x-1 text-xs text-red-400">
-                    {item.spiceLevel ? (
-                      <>
-                        <Flame className="w-3.5 h-3.5 fill-red-500 text-red-500" />
-                        <span>{'🌶️'.repeat(item.spiceLevel)}</span>
-                      </>
-                    ) : (
-                      <span className="text-ivory/50">Mild</span>
-                    )}
-                  </div>
+                  <SpiceIndicator level={item.spiceLevel} />
 
                   <div className="text-right">
                     <span className="text-xs font-semibold text-gold block">
@@ -285,9 +310,9 @@ export default function MenuExplorer() {
                   Enquire Dish for Feast
                 </Button>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   );

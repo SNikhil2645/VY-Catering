@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 
 export default function BananaLeafHero() {
   return (
-    <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
+    <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-28 sm:pt-32 pb-16">
       {/* Background Cinematic Food & Banquet Image with Deep Gradients */}
       <div className="absolute inset-0 z-0">
         <Image

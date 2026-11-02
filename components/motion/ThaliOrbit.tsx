@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Sparkles, Flame, CheckCircle, ChevronRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import SpiceIndicator from '@/components/ui/SpiceIndicator';
 
 interface ThaliDish {
   id: string;
@@ -25,7 +26,7 @@ const THALI_DISHES: ThaliDish[] = [
     description: 'Tender baby mutton marinated in cold-pressed oils, browned onions, green chilies, and whole spices, slow-cooked in sealed copper handis over wood fire.',
     tradition: 'Served with mirchi ka salan and thick onion raita at royal Andhra banquets.',
     spiceLevel: 4,
-    imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop',
+    imageUrl: '/mutton-biryani.png',
   },
   {
     id: 'prawns',
@@ -35,7 +36,7 @@ const THALI_DISHES: ThaliDish[] = [
     description: 'Fresh coastal prawns marinated in crushed black pepper, Kashmiri chili, and garlic, flash-fried with aromatic curry leaves.',
     tradition: 'The most requested live-counter starter at Venky Yadav receptions.',
     spiceLevel: 5,
-    imageUrl: 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?q=80&w=800&auto=format&fit=crop',
+    imageUrl: '/Crispy Andhra Loose Prawns.png',
   },
   {
     id: 'gutti-vankaya',
@@ -45,7 +46,7 @@ const THALI_DISHES: ThaliDish[] = [
     description: 'Small tender purple eggplants stuffed with freshly ground sesame seeds, roasted peanuts, dry coconut, and coriander seeds.',
     tradition: 'Essential traditional vegetarian curry for auspicious Telugu weddings.',
     spiceLevel: 3,
-    imageUrl: 'https://images.unsplash.com/photo-1645177628172-a94c1f96e6db?q=80&w=800&auto=format&fit=crop',
+    imageUrl: '/Gutti Vankaya Kura.png',
   },
   {
     id: 'chicken-fry',
@@ -55,7 +56,7 @@ const THALI_DISHES: ThaliDish[] = [
     description: 'Country chicken pieces slow-roasted in hand-pounded masala until the spices create a deep, fragrant crust around each piece.',
     tradition: 'Prepared over open flame for deep smokiness and intense flavour.',
     spiceLevel: 5,
-    imageUrl: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800&auto=format&fit=crop',
+    imageUrl: '/andhra-style-chicken-fry.png',
   },
   {
     id: 'fish-pulusu',
@@ -65,7 +66,7 @@ const THALI_DISHES: ThaliDish[] = [
     description: 'Freshwater fish and whole tender okra simmered in a piquant tamarind reduction with garlic, fenugreek, and mustard temper.',
     tradition: 'Tastes even richer as it rests in earthenware pots.',
     spiceLevel: 4,
-    imageUrl: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop',
+    imageUrl: '/Bendakaya Chepala Pulusu.png',
   },
 ];
 
@@ -107,10 +108,10 @@ export default function ThaliOrbit() {
                   key={dish.id}
                   type="button"
                   onClick={() => setActiveDish(dish)}
-                  className={`w-full text-left p-4 rounded-sm transition-all duration-300 flex items-center justify-between border ${
+                  className={`w-full text-left p-4 rounded-xl transition-all duration-300 flex items-center justify-between border ${
                     isSelected
-                      ? 'bg-maroon/40 border-gold shadow-lg shadow-maroon/20 translate-x-2'
-                      : 'bg-charcoal-700/60 border-white/10 hover:border-gold/40 hover:bg-charcoal-700'
+                      ? 'bg-maroon/60 border-gold shadow-lg shadow-maroon/30 translate-x-2 backdrop-blur-md'
+                      : 'bg-white/[0.05] backdrop-blur-[14px] border-white/[0.12] hover:border-white/[0.28] hover:bg-white/[0.08]'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -142,7 +143,7 @@ export default function ThaliOrbit() {
 
           {/* Central Featured Dish Showcase */}
           <div className="lg:col-span-7">
-            <div className="bg-gradient-to-br from-charcoal-700 via-charcoal-800 to-charcoal-900 border-2 border-gold/40 rounded-sm p-6 sm:p-8 shadow-2xl relative">
+            <div className="bg-white/[0.06] backdrop-blur-[20px] backdrop-saturate-[160%] border border-white/[0.14] rounded-2xl p-6 sm:p-8 shadow-2xl relative">
               {/* Brass Thali Motif Ring */}
               <div className="relative h-64 sm:h-80 w-full rounded-sm overflow-hidden mb-6 border border-gold/30">
                 <Image
@@ -158,9 +159,8 @@ export default function ThaliOrbit() {
                     {activeDish.category}
                   </span>
                 </div>
-                <div className="absolute bottom-4 left-4 flex items-center space-x-1 bg-charcoal/80 px-2.5 py-1 rounded-sm text-xs text-red-400">
-                  <Flame className="w-3.5 h-3.5 fill-red-500" />
-                  <span>Spice Level: {'🌶️'.repeat(activeDish.spiceLevel)}</span>
+                <div className="absolute bottom-4 left-4 bg-charcoal/90 backdrop-blur-md px-3 py-1.5 rounded-sm border border-gold/30">
+                  <SpiceIndicator level={activeDish.spiceLevel} />
                 </div>
               </div>
 

@@ -42,6 +42,39 @@ body {
   background: #C6A15B;
 }
 
+/* Gold Scroll Progress Indicator (Modern Compositor-Driven CSS Scroll Animation) */
+@keyframes grow-scroll-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.gold-scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #8A6828 0%, #D4AF37 50%, #F5E5A4 100%);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  z-index: 9999;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.7), 0 0 3px rgba(212, 175, 55, 0.9);
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .gold-scroll-progress-bar {
+      animation: grow-scroll-progress auto linear;
+      animation-timeline: scroll();
+    }
+  }
+}
+
 /* Reduced Motion Safety */
 @media (prefers-reduced-motion: reduce) {
   *,

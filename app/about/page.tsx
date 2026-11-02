@@ -39,10 +39,11 @@ export default function AboutPage() {
             <div className="lg:col-span-5">
               <div className="relative h-96 sm:h-[500px] w-full rounded-sm overflow-hidden border-2 border-gold/40 shadow-2xl bg-charcoal-800">
                 <Image
-                  src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=800&auto=format&fit=crop"
+                  src="/intro.png"
                   alt="Founder Telavani Venkatesh - Venky Yadav Catering Leadership"
                   fill
-                  className="object-cover"
+                  priority
+                  className="object-cover object-top"
                   sizes="(max-width: 1024px) 100vw, 40vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-transparent" />

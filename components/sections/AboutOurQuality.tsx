@@ -24,7 +24,7 @@ export default function AboutOurQuality() {
               {/* Image Frame */}
               <div className="relative h-[480px] sm:h-[540px] w-full bg-gradient-to-b from-charcoal-900 to-charcoal-800">
                 <Image
-                  src="/image_G-G4Sz.png"
+                  src="/intro.png"
                   alt="Venky Anna holding the large feast platter - Venky Yadav Caterings Tirupati"
                   fill
                   priority

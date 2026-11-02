@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { X, ChevronLeft, ChevronRight, Eye, ShieldCheck, Sparkles } from 'lucide-react';
-import Badge from '@/components/ui/Badge';
+import Link from 'next/link';
+import { X, ChevronLeft, ChevronRight, Eye, ShieldCheck, Sparkles, Camera, ArrowRight, Utensils } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import Button from '@/components/ui/Button';
 
 interface GalleryAsset {
   id: string;
@@ -16,6 +18,7 @@ interface GalleryAsset {
 }
 
 export default function GalleryGrid() {
+  const shouldReduceMotion = useReducedMotion();
   const [assets, setAssets] = useState<GalleryAsset[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -28,7 +31,7 @@ export default function GalleryGrid() {
         const res = await fetch('/api/gallery');
         const data = await res.json();
         if (data.success) {
-          setAssets(data.assets);
+          setAssets(data.assets || []);
         }
       } catch (err) {
         console.error('Failed to load gallery:', err);
@@ -62,13 +65,13 @@ export default function GalleryGrid() {
   };
 
   const handleNext = useCallback(() => {
-    if (lightboxIndex !== null) {
+    if (lightboxIndex !== null && filteredAssets.length > 0) {
       setLightboxIndex((prev) => ((prev as number) + 1) % filteredAssets.length);
     }
   }, [lightboxIndex, filteredAssets.length]);
 
   const handlePrev = useCallback(() => {
-    if (lightboxIndex !== null) {
+    if (lightboxIndex !== null && filteredAssets.length > 0) {
       setLightboxIndex((prev) =>
         (prev as number) - 1 < 0 ? filteredAssets.length - 1 : (prev as number) - 1
       );
@@ -89,49 +92,142 @@ export default function GalleryGrid() {
 
   return (
     <div className="space-y-8">
-      {/* Category Filter Buttons */}
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        {categories.map((cat) => {
-          const isSelected = selectedCategory === cat.value;
-          return (
-            <button
-              key={cat.value}
-              type="button"
-              onClick={() => setSelectedCategory(cat.value)}
-              className={`px-4 py-2 rounded-sm text-xs font-semibold uppercase tracking-wider transition-all border ${
-                isSelected
-                  ? 'bg-maroon text-gold border-gold shadow-md'
-                  : 'bg-charcoal-800 text-ivory/70 border-white/10 hover:border-gold/30 hover:text-ivory'
-              }`}
-            >
-              {cat.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Grid */}
-      {loading ? (
-        <div className="py-20 text-center">
-          <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-sm text-ivory/60">Loading event photography...</p>
+      {/* Category Filter Buttons (Only shown if gallery has assets) */}
+      {assets.length > 0 && (
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat.value;
+            return (
+              <button
+                key={cat.value}
+                type="button"
+                onClick={() => setSelectedCategory(cat.value)}
+                className={`px-4 py-2 rounded-sm text-xs font-semibold uppercase tracking-wider transition-all border ${
+                  isSelected
+                    ? 'bg-maroon text-gold border-gold shadow-md'
+                    : 'bg-charcoal-800 text-ivory/70 border-white/10 hover:border-gold/30 hover:text-ivory'
+                }`}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
         </div>
+      )}
+
+      {/* Grid or Empty State */}
+      {loading ? (
+        <div className="py-24 text-center">
+          <div className="w-9 h-9 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm text-ivory/70 font-medium">Curating event photography...</p>
+        </div>
+      ) : assets.length === 0 ? (
+        /* Polished Empty State for Visitors when no photos are published */
+        <motion.div
+          initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="relative max-w-2xl mx-auto py-16 px-6 sm:px-12 rounded-2xl bg-gradient-to-b from-charcoal-800/90 via-charcoal-800/60 to-charcoal-900 border border-gold/40 shadow-2xl text-center overflow-hidden"
+        >
+          {/* Subtle Background Glow */}
+          <div className="absolute top-0 right-1/2 translate-x-1/2 w-72 h-40 bg-maroon/25 blur-3xl pointer-events-none" />
+
+          {/* Icon Badge */}
+          <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-full bg-charcoal-900 border border-gold/60 text-gold shadow-xl mb-6">
+            <Camera className="w-8 h-8 text-gold" />
+            <span className="absolute -top-1 -right-1 flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-75" />
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-gold" />
+            </span>
+          </div>
+
+          <span className="text-xs uppercase tracking-widest text-gold font-semibold block mb-2">
+            Visual Chronicle in Curation
+          </span>
+
+          <h3 className="font-serif text-2xl sm:text-3xl font-bold text-ivory mb-2">
+            Archiving Our Celebrations
+          </h3>
+
+          <p className="font-telugu text-sm text-gold/80 mb-4 font-medium">
+            త్వరలో మా తాజా రాయలసీమ విందుల ఫోటోలు
+          </p>
+
+          <p className="text-sm text-ivory/75 max-w-lg mx-auto leading-relaxed mb-8">
+            We are curating high-resolution photography from our recent grand wedding banquets, wood-fire dum biryani handis, and traditional sadhyas across Tirupati. Check back shortly to explore our newly published event chronicles.
+          </p>
+
+          {/* Action CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button
+              href="/booking"
+              variant="primary"
+              size="md"
+              className="w-full sm:w-auto shadow-lg shadow-maroon/40"
+              icon={<ArrowRight className="w-4 h-4 text-gold" />}
+            >
+              Plan Your Event Feast
+            </Button>
+            <Button
+              href="/menu"
+              variant="outline"
+              size="md"
+              className="w-full sm:w-auto"
+              icon={<Utensils className="w-4 h-4 text-gold" />}
+            >
+              Explore Our Menu
+            </Button>
+          </div>
+        </motion.div>
       ) : filteredAssets.length === 0 ? (
-        <div className="py-16 text-center text-ivory/60">No photos in this category.</div>
+        <div className="py-16 text-center text-ivory/60 bg-charcoal-800/40 border border-white/10 rounded-sm">
+          <Camera className="w-8 h-8 text-gold/40 mx-auto mb-2" />
+          <p className="text-sm">No photos in this category yet.</p>
+          <button
+            type="button"
+            onClick={() => setSelectedCategory('ALL')}
+            className="mt-3 text-xs text-gold underline underline-offset-4 hover:text-gold-light"
+          >
+            View all photographs
+          </button>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div
+          layout
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: shouldReduceMotion ? 0 : 0.08,
+              },
+            },
+          }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {filteredAssets.map((asset, index) => (
-            <div
+            <motion.div
+              layout
+              variants={{
+                hidden: shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+                },
+              }}
               key={asset.id}
               onClick={() => openLightbox(index)}
               className="group relative h-72 sm:h-80 rounded-sm overflow-hidden border border-gold/20 hover:border-gold cursor-pointer transition-all duration-300 hover:shadow-2xl bg-charcoal-900"
             >
               <Image
                 src={asset.imageUrl}
-                alt={asset.altText}
+                alt={asset.altText || asset.title}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                className="object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
 
@@ -157,9 +253,9 @@ export default function GalleryGrid() {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* Lightbox Modal with Brass Frame */}
@@ -213,7 +309,7 @@ export default function GalleryGrid() {
             <div className="relative h-[55vh] sm:h-[65vh] w-full bg-black">
               <Image
                 src={filteredAssets[lightboxIndex].imageUrl}
-                alt={filteredAssets[lightboxIndex].altText}
+                alt={filteredAssets[lightboxIndex].altText || filteredAssets[lightboxIndex].title}
                 fill
                 priority
                 sizes="(max-width: 1200px) 100vw, 1200px"
@@ -239,7 +335,7 @@ export default function GalleryGrid() {
 
               <div className="flex items-center space-x-2 text-[11px] text-ivory/50">
                 <ShieldCheck className="w-4 h-4 text-gold" />
-                <span>Verified Licensed Hospitality Photography</span>
+                <span>Verified Authentic Photography</span>
               </div>
             </div>
           </div>
