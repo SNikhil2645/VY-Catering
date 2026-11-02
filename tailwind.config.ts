@@ -62,6 +62,10 @@ const config: Config = {
         "fade-in": "fadeIn 0.6s ease-out forwards",
         "slide-up": "slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "draw-kolam": "drawKolam 1.8s ease-in-out forwards",
+        "elastic-pulse": "elasticPulse 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+        "slide-fade-left": "slideFadeLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "slide-fade-right": "slideFadeRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "stagger-in": "staggerIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards",
       },
       keyframes: {
         fadeIn: {
@@ -75,6 +79,24 @@ const config: Config = {
         drawKolam: {
           "0%": { strokeDashoffset: "1000" },
           "100%": { strokeDashoffset: "0" },
+        },
+        elasticPulse: {
+          "0%": { transform: "scale(1)" },
+          "40%": { transform: "scale(1.18)" },
+          "70%": { transform: "scale(0.96)" },
+          "100%": { transform: "scale(1)" },
+        },
+        slideFadeLeft: {
+          "0%": { opacity: "0", transform: "translateX(-24px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        slideFadeRight: {
+          "0%": { opacity: "0", transform: "translateX(24px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        staggerIn: {
+          "0%": { opacity: "0", transform: "translateY(16px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
       },
     },

@@ -29,4 +29,5 @@ This document tracks all imagery, media assets, their current licensing/placehol
 | `cafe-fried-chicken` | Cafe | Unsplash (Crispy Golden Fried Chicken Wings) | Cafe Teaser Highlights | Verified Placeholder |
 | `woodfire-cooking` | Process | Unsplash (Large Deg on Firewood with aromatic steam) | Journey of a Feast Step 2 | Verified Placeholder |
 | `serving-feast` | Process | Unsplash (Banana leaf sadhya feast serving) | Journey of a Feast Step 4 | Verified Placeholder |
+| `venky-anna-platter` | Featured / Quality | `public/image_G-G4Sz.png` (Venky Anna holding feast platter) | Homepage "About Our Quality" Featured Column | Active Cutout Asset (`image_G-G4Sz.png`) |
 | `founder-portrait` | About | Stylized Silhouette / Traditional Hospitality Avatar | About Page Founder Section | Awaiting Real Photo of Telavani Venkatesh |
