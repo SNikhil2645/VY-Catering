@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           String     @id @default(uuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         String     @default("ADMIN") // SUPERADMIN, ADMIN, MANAGER
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  auditLogs    AuditLog[]
+}
+
+model Enquiry {
+  id                     String    @id @default(uuid())
+  referenceCode          String    @unique // e.g. VYC-2026-10492
+  customerName           String
+  phone                  String
+  email                  String?
+  preferredContactMethod String    @default("PHONE") // PHONE, WHATSAPP, EMAIL
+  eventType              String    // Wedding, Reception, Corporate, Birthday, etc.
+  eventDate              String    // YYYY-MM-DD
+  eventStartTime         String?   // e.g. "11:00 AM", "07:00 PM"
+  guestCount             Int
+  venue                  String?
+  eventFormat            String?   @default("BUFFET") // SIT_DOWN_SADHYA, BUFFET, LIVE_COUNTERS, HYBRID
+  foodPreference         String    // VEG, NON_VEG, BOTH
+  specialRequests        String?
+  status                 String    @default("NEW") // NEW, CONTACTED, QUOTATION_IN_PROGRESS, QUOTATION_SENT, CONFIRMED, COMPLETED, CANCELLED
+  internalNotes          String?
+  source                 String    @default("WEBSITE")
+  consentTimestamp       DateTime  @default(now())
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+}
+
+model MenuCategory {
+  id           String     @id @default(uuid())
+  name         String
+  slug         String     @unique
+  description  String?
+  displayOrder Int        @default(0)
+  active       Boolean    @default(true)
+  items        MenuItem[]
+}
+
+model MenuItem {
+  id           String        @id @default(uuid())
+  categoryId   String
+  category     MenuCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  businessType String        @default("CATERING") // CATERING, CAFE
+  name         String
+  slug         String        @unique
+  description  String
+  price        Float?        // null means "on enquiry"
+  dietaryType  String        @default("VEG") // VEG, NON_VEG, SATVIK, JAIN, HALAL
+  imageUrl     String?
+  availability Boolean       @default(true)
+  featured     Boolean       @default(false)
+  displayOrder Int           @default(0)
+  spiceLevel   Int?          @default(2) // 1 to 5
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model GalleryAsset {
+  id                     String   @id @default(uuid())
+  title                  String
+  description            String?
+  category               String   // WEDDINGS, LARGE_SCALE, OUTDOOR_COOKING, BUFFETS, SIGNATURE_DISHES, BEHIND_THE_SCENES
+  imageUrl               String
+  thumbnailUrl           String?
+  mediaType              String   @default("IMAGE") // IMAGE, VIDEO
+  altText                String
+  displayOrder           Int      @default(0)
+  published              Boolean  @default(true)
+  source                 String   @default("AUTHENTIC_PLACEHOLDER")
+  usagePermissionStatus  String   @default("VERIFIED_PLACEHOLDER") // VERIFIED_PLACEHOLDER, OWNER_APPROVED, PENDING_APPROVAL
+  createdAt              DateTime @default(now())
+}
+
+model BusinessProfile {
+  id             String   @id @default(uuid())
+  businessType   String   @unique // CATERINGS, CAFE
+  businessName   String
+  tagline        String?
+  address        String
+  phone          String
+  alternatePhone String?
+  email          String?
+  operatingHours String?
+  serviceAreas   String   // JSON or comma separated
+  socialLinks    String?  // JSON string
+  published      Boolean  @default(true)
+  updatedAt      DateTime @updatedAt
+}
+
+model SiteContent {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  title     String
+  body      String
+  imageUrl  String?
+  metadata  String?  // JSON string
+  updatedAt DateTime @updatedAt
+}
+
+model FunctionType {
+  id               String   @id @default(uuid())
+  name             String
+  slug             String   @unique
+  category         String   // WEDDING_PREWEDDING, FAMILY_LIFE, RELIGIOUS_FESTIVAL, CORPORATE, SOCIAL
+  description      String
+  recommendedMenus String?  // JSON string or bullet points
+  servingFormat    String   // Sit-down sadhya, Grand buffet, Live counters
+  minGuests        Int      @default(350)
+  displayOrder     Int      @default(0)
+  published        Boolean  @default(true)
+}
+
+model CuisineType {
+  id              String   @id @default(uuid())
+  name            String
+  slug            String   @unique
+  description     String
+  signatureDishes String   // Comma separated
+  displayOrder    Int      @default(0)
+}
+
+model Testimonial {
+  id           String   @id @default(uuid())
+  authorName   String
+  eventType    String
+  eventDate    String?
+  rating       Int      @default(5)
+  content      String
+  verified     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model Faq {
+  id           String   @id @default(uuid())
+  question     String
+  answer       String
+  category     String   @default("GENERAL") // GENERAL, BOOKING, MENU, PRICING, VENUE
+  displayOrder Int      @default(0)
+  published    Boolean  @default(true)
+}
+
+model AuditLog {
+  id           String     @id @default(uuid())
+  adminUserId  String
+  adminUser    AdminUser  @relation(fields: [adminUserId], references: [id])
+  action       String     // CREATE, UPDATE, DELETE, STATUS_CHANGE
+  resourceType String     // ENQUIRY, MENU, GALLERY, SETTINGS
+  resourceId   String?
+  timestamp    DateTime   @default(now())
+}
