@@ -4,7 +4,7 @@ import { verifyAdminToken, AdminPayload } from './token';
 export const ADMIN_COOKIE_NAME = 'vyc_admin_session';
 
 export async function getCurrentAdmin(): Promise<AdminPayload | null> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
   return verifyAdminToken(token);
 }

@@ -2,15 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
 import { getCurrentAdmin } from '@/lib/auth/session';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const admin = await getCurrentAdmin();
   if (!admin) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const { id } = await params;
+
   try {
     const enquiry = await prisma.enquiry.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!enquiry) {
@@ -23,18 +28,23 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const admin = await getCurrentAdmin();
   if (!admin) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  const { id } = await params;
 
   try {
     const body = await req.json();
     const { status, internalNotes } = body;
 
     const updated = await prisma.enquiry.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(status ? { status } : {}),
         ...(internalNotes !== undefined ? { internalNotes } : {}),
@@ -47,7 +57,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         adminUserId: admin.userId,
         action: 'STATUS_CHANGE',
         resourceType: 'ENQUIRY',
-        resourceId: params.id,
+        resourceId: id,
       },
     });
 
